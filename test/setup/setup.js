@@ -1,6 +1,7 @@
 module.exports = function(root) {
   root = root ? root : global;
   root.expect = root.chai.expect;
+  root.expect.should = root.chai.should();
 
   beforeEach(function() {
     // Using these globally-available Sinon features is preferrable, as they're

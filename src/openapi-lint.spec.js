@@ -1,4 +1,4 @@
-import OpenAPILint from '../../src/openapi-lint';
+import OpenAPILint from './openapi-lint';
 
 describe('OpenAPILint', () => {
   describe('Greet function', () => {
