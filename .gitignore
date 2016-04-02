@@ -26,3 +26,6 @@ tmp
 
 # Users Environment Variables
 .lock-wscript
+
+# dist dir
+dist
