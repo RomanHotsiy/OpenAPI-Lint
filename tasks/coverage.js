@@ -4,7 +4,7 @@ import {Instrumenter} from 'isparta';
 import {mocha} from './test';
 const $ = global.$;
 
-function coverage(done) {
+export function coverage(done) {
   require('babel-register');
   gulp.src(['src/**/!(*spec).js'])
     .pipe($.istanbul({ instrumenter: Instrumenter }))

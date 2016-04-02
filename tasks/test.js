@@ -1,6 +1,7 @@
 import gulp  from 'gulp';
 import {Server as KarmaServer} from 'karma';
 
+import {coverage} from './coverage';
 import mochaGlobals from '../test/setup/.globals.json';
 const $ = global.$;
 
@@ -25,7 +26,7 @@ function test(done) {
   if (process.env.KARMA) {
     karma(done);
   } else {
-    mocha();
+    coverage(done);
   }
 }
 
