@@ -1,19 +1,19 @@
 language: node_js
 matrix:
   include:
-    # Node
-    - node_js: 4
-    - node_js: stable
-
-    # Local Browsers
-    - node_js: 4
-      env: KARMA=true
+  - node_js: 4
+  - node_js: stable
+  - node_js: 4
+    env: KARMA=true
   fast_finish: true
 sudo: false
 before_script:
-  - export DISPLAY=:99.0
-  - sh -e /etc/init.d/xvfb start
-script: "gulp coverage"
+- export DISPLAY=:99.0
+- sh -e /etc/init.d/xvfb start
+script: gulp coverage
 after_success:
-  - npm install -g codeclimate-test-reporter
-  - codeclimate-test-reporter < coverage/lcov.info
+- npm install -g codeclimate-test-reporter
+- codeclimate-test-reporter < coverage/lcov.info
+env:
+  global:
+    secure: oSRLQ1GTkLz5YoJhDxuT5gchx149G0sbfvyEvN8IFl3/mZ/q2K9QVBQtqqD1hhpZ+JrkUWhTN0UDeT3v1hXNr7dyUsy0+zwirvdR52NPSad5wTPOBZS1QRX+JfYTjfuX2ZniX+rc8hBZJlvqKOpqsnpPVpTmUQoFsHCFLejtj2hBRLvhG1B0Pc4ENQ80Mh+tIBOEMgazNNLwyjAkWALEJa61HIKm3TFBggB64bG5/dgEQ6Kldhy9ivzhND5le+g1J4EsPe21FV/Yx9UvVC3onc31R9rUuCrmx+5XsRUkew3KeL9byT2BVg8U7XSaq0PmGDdFYvbaNO8PgNcFLIuCApvsti0tqH/36UDAsyGtuFpHA8/PthLlLSTFBDkdXyH7O/qxty0FyaQUn3PudwrpRhqqbQr/UXlGlHm0Gth3s1nkimJx7kwcms8t0PKwfJYJfrrHxHqkvldv7+ikjL00YUCKpfhx8DGnroQdzcaByoIiLiMrqVkpDl23eK/zeYfJzXPDMcbhUMKTJGn/wBVLZa6jCCSqTTUh7HNmTF4Hdnxx7NpdGH4kaNTtDxfNnBQVUN9umQN8iOEZVBZ7SL7flLcJKamAysBgQ2wdhB7+EjjCCPyTmk78p3g3g3W7Gkr9jBb4HjkgWytUxDOiCQFKOESBNRDflUc6cPM/Bpi1WFg=
