@@ -11,7 +11,9 @@ export function coverage(done) {
     .pipe($.istanbul.hookRequire())
     .on('finish', () => {
       return mocha()
-        .pipe($.istanbul.writeReports())
+        .pipe($.istanbul.writeReports({
+          dir: './coverage/lcov'
+        }))
         .on('end', done);
     });
 }
