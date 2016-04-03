@@ -7,7 +7,7 @@ const $ = global.$;
 
 export function mocha() {
   require('babel-register');
-  return gulp.src(['test/setup/node.js', 'test/unit/**/*.js', 'src/**/*.spec.js'], {read: false})
+  return gulp.src(['test/setup/node.js', 'test/**/*.spec.js', 'src/**/*.spec.js'], {read: false})
     .pipe($.mocha({
       reporter: 'spec',
       globals: Object.keys(mochaGlobals.globals),

@@ -40,9 +40,10 @@ module.exports = function (config) {
           ]
         },
         files: [
+          'node_modules/babel-polyfill/dist/polyfill.js',
           './test/setup/browser.js',
-          './src/**/*.js',
-          './test/**/*.js',
+          'test/**/*.spec.js',
+          'src/**/*.spec.js',
           {pattern: 'test/specs/**', included: false, served: true}
         ],
 
