@@ -4,7 +4,7 @@ const message = 'Cannot have multiple operations with the same operationId: ';
 
 export default class OperationIDUnique extends BaseChecker {
   constructor() {
-    super('DUPLICATE_OPERATIONID');
+    super();
     this.subscribeDeref(['$.paths.*.*']);
 
     this.operationIDSet = new Set();
@@ -17,7 +17,7 @@ export default class OperationIDUnique extends BaseChecker {
     }
 
     if (this.operationIDSet.has(operationId)) {
-      return this.report(message + operationId, path.concat('operationId'));
+      return this.report('DUPLICATE_OPERATIONID', message + operationId, path.concat('operationId'));
     }
 
     this.operationIDSet.add(operationId);

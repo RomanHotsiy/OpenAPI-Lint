@@ -2,7 +2,7 @@ import {RULE_TYPE} from '../types/ruleType';
 import {groupBy, keys} from 'lodash';
 
 export default function applyRules(checks) {
-  let totalScore = 100;
+  let points = 0;
   let error = false;
   let rules = [];
   let groupedChecks = groupBy(checks, 'code');
@@ -17,22 +17,17 @@ export default function applyRules(checks) {
         error = true;
         continue;
       }
-
-      rule.score = pointsToScore(rule.points);
-      totalScore -= rule.score;
+    } else {
+      points += rule.points || 0;
     }
     rules.push(rule);
   }
 
   if (error) {
-    totalScore = 0;
+    points = 0;
   }
 
-  return {error, totalScore, rules};
-}
-
-function pointsToScore(points = 0) {
-  return points / maxPoints * 100;
+  return {error, points, rules};
 }
 
 export const RULES = [
@@ -48,7 +43,18 @@ export const RULES = [
     name: 'Extra referece properties',
     description: 'Extra JSON Reference properties will be ignored according to JSONSchema spec',
     points: 4
+  },
+  {
+    type: RULE_TYPE.WARNING,
+    code: 'TYPE_OBJECT_MISSING',
+    name: 'Type object expected',
+    description: 'You have specified `properties` on schema. Usually it works together with type: object',
+    points: 2
   }
 ];
 
 const maxPoints = RULES.reduce((rule, sum) => sum + rule.points || 0, 0);
+
+export function pointsToScore(points = 0) {
+  return points / maxPoints * 100;
+}

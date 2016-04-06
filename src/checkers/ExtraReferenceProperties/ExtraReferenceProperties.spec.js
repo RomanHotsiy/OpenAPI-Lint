@@ -23,7 +23,7 @@ describe('Checkers:', () => {
       let res = checker.check('ref', ['$', 'paths', '$ref'], api);
 
       res.should.be.an('object');
-      res.code.should.be.equal(checker.code);
+      res.code.should.be.equal('EXTRA_REFERENCE_PROPERTIES');
       res.message.should.contain('type, description');
       res.path.should.be.deep.equal(['$', 'paths']);
     });

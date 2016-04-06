@@ -1,6 +1,5 @@
 export default class BaseChecker {
-  constructor(code) {
-    this.code = code;
+  constructor() {
     this.paths = [];
     this.pathsDeref = [];
   }
@@ -13,9 +12,9 @@ export default class BaseChecker {
     this.paths = paths;
   }
 
-  report(message, path) {
+  report(code, message, path) {
     return {
-      code: this.code,
+      code: code,
       message,
       path
     };

@@ -11,7 +11,7 @@ describe('Checkers:', () => {
       checker.check({operationId: 'test'}, ['/testpath']);
       let res = checker.check({operationId: 'test'}, ['/testpath2']);
       res.should.be.a('object');
-      res.code.should.be.equal(checker.code);
+      res.code.should.be.equal('DUPLICATE_OPERATIONID');
       res.path.should.be.deep.equal(['/testpath2', 'operationId']);
     });
 

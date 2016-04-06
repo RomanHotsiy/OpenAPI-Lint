@@ -6,7 +6,7 @@ const message = 'Extra JSON Reference properties will be ignored:';
 
 export default class OperationIDUnique extends BaseChecker {
   constructor() {
-    super('EXTRA_REFERENCE_PROPERTIES');
+    super();
     this.subscribe(['$..*["$ref"]']);
   }
 
@@ -20,7 +20,7 @@ export default class OperationIDUnique extends BaseChecker {
     let parent = jp.value(api.spec, parentPath);
     let extraKeys = without(keys(parent), '$ref');
     if (extraKeys.length) {
-      return this.report(`${message} ${extraKeys.join(', ')}`, parentPath);
+      return this.report('EXTRA_REFERENCE_PROPERTIES', `${message} ${extraKeys.join(', ')}`, parentPath);
     }
   }
 }

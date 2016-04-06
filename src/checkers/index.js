@@ -3,6 +3,7 @@ import {flatten} from 'lodash';
 
 import OperationIDUnique from './OperationIDUnique/OperationIDUnique';
 import ExtraReferenceProperties from './ExtraReferenceProperties/ExtraReferenceProperties';
+import TypeObjectMissing from './TypeObjectMissing/TypeObjectMissing';
 
 export var CHECKERS = [
   OperationIDUnique,
