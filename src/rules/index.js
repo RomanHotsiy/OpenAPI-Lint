@@ -28,7 +28,7 @@ export default function applyRules(checks) {
     totalScore = 0;
   }
 
-  return { error, totalScore, rules };
+  return {error, totalScore, rules};
 }
 
 function pointsToScore(points = 0) {
