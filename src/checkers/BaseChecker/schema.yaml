@@ -1,0 +1,255 @@
+title: 'Simplified version of OpenAPI/Swagger 2.0 schema'
+$schema: 'http://json-schema.org/draft-04/schema#'
+properties:
+  swagger: {}
+  info:
+    properties:
+      title: {}
+      version: {}
+      description: {}
+      termsOfService: {}
+      contact:
+        properties:
+          name: {}
+          url: {}
+          email: {}
+      license:
+        properties:
+          name: {}
+          url: {}
+  host: {}
+  basePath: {}
+  schemes:
+    items: {}
+  consumes:
+    items: {}
+  produces:
+    items: {}
+  paths:
+    patternProperties:
+      ^/:
+        properties:
+          $ref: {}
+          get:
+            $ref: '#/definitions/operation'
+          put:
+            $ref: '#/definitions/operation'
+          post:
+            $ref: '#/definitions/operation'
+          delete:
+            $ref: '#/definitions/operation'
+          options:
+            $ref: '#/definitions/operation'
+          head:
+            $ref: '#/definitions/operation'
+          patch:
+            $ref: '#/definitions/operation'
+          parameters:
+            items:
+              $ref: '#/definitions/parameter'
+  definitions:
+    additionalProperties:
+      $ref: '#/definitions/schema'
+  parameters:
+    additionalProperties:
+      $ref: '#/definitions/parameter'
+  responses:
+    additionalProperties:
+      $ref: '#/definitions/response'
+  security:
+    items:
+      additionalProperties:
+        items: {}
+  securityDefinitions:
+    additionalProperties:
+      properties:
+        type: {}
+        name: {}
+        in: {}
+        flow: {}
+        scopes:
+          additionalProperties: {}
+        authorizationUrl: {}
+        tokenUrl: {}
+        description: {}
+  tags:
+    items:
+      properties:
+        name: {}
+        description: {}
+        externalDocs:
+          properties:
+            description: {}
+            url: {}
+  externalDocs:
+    properties:
+      description: {}
+      url: {}
+definitions:
+  operation:
+    properties:
+      tags:
+        items: {}
+      summary: {}
+      description: {}
+      externalDocs:
+        properties:
+          description: {}
+          url: {}
+      operationId: {}
+      produces:
+        items: {}
+      consumes:
+        items: {}
+      parameters:
+        items:
+          $ref: '#/definitions/parameter'
+      responses:
+        properties:
+          default:
+            $ref: '#/definitions/response'
+        patternProperties:
+          '^([0-9]{3})$':
+            $ref: '#/definitions/response'
+      schemes:
+        items: {}
+      deprecated: {}
+      security:
+        items:
+          additionalProperties:
+            items: {}
+  response:
+    properties:
+      $ref: {}
+      description: {}
+      schema:
+        $ref: '#/definitions/schema'
+      headers:
+        additionalProperties:
+          properties:
+            type: {}
+            format: {}
+            items:
+              $ref: '#/definitions/primitivesItems'
+            collectionFormat: {}
+            default: {}
+            maximum: {}
+            exclusiveMaximum: {}
+            minimum: {}
+            exclusiveMinimum: {}
+            maxLength: {}
+            minLength: {}
+            pattern: {}
+            maxItems: {}
+            minItems: {}
+            uniqueItems: {}
+            enum: {}
+            multipleOf: {}
+            description: {}
+            examples:
+              additionalProperties: {}
+  parameter:
+    properties:
+      $ref: {}
+      description: {}
+      name: {}
+      in: {}
+      required: {}
+      schema:
+        $ref: '#/definitions/schema'
+      type: {}
+      format: {}
+      items:
+        $ref: '#/definitions/primitivesItems'
+      collectionFormat: {}
+      default: {}
+      maximum: {}
+      exclusiveMaximum: {}
+      minimum: {}
+      exclusiveMinimum: {}
+      maxLength: {}
+      minLength: {}
+      pattern: {}
+      maxItems: {}
+      minItems: {}
+      uniqueItems: {}
+      enum: {}
+      multipleOf: {}
+      allowEmptyValue: {}
+  schema:
+    properties:
+      $ref: {}
+      format: {}
+      title: {}
+      description: {}
+      default: {}
+      multipleOf: {}
+      maximum: {}
+      exclusiveMaximum: {}
+      minimum: {}
+      exclusiveMinimum: {}
+      maxLength: {}
+      minLength: {}
+      pattern: {}
+      maxItems: {}
+      minItems: {}
+      uniqueItems: {}
+      maxProperties: {}
+      minProperties: {}
+      required: {}
+      enum: {}
+      additionalProperties:
+        oneOf:
+          - type: object
+            allOf:
+              - $ref: '#/definitions/schema'
+          - type: boolean
+      type: {}
+      items:
+        oneOf:
+          - type: object
+            allOf:
+              - $ref: '#/definitions/schema'
+          - type: array
+            items:
+              $ref: '#/definitions/schema'
+      allOf:
+        items:
+          $ref: '#/definitions/schema'
+      properties:
+        additionalProperties:
+          $ref: '#/definitions/schema'
+      discriminator: {}
+      readOnly: {}
+      xml:
+        properties:
+          name: {}
+          namespace: {}
+          prefix: {}
+          attribute: {}
+          wrapped: {}
+      externalDocs:
+        properties:
+          description: {}
+          url: {}
+      example: {}
+  primitivesItems:
+    properties:
+      type: {}
+      format: {}
+      items:
+        $ref: '#/definitions/primitivesItems'
+      collectionFormat: {}
+      default: {}
+      maximum: {}
+      exclusiveMaximum: {}
+      minimum: {}
+      exclusiveMinimum: {}
+      maxLength: {}
+      minLength: {}
+      pattern: {}
+      maxItems: {}
+      minItems: {}
+      uniqueItems: {}
+      enum: {}
+      multipleOf: {}
