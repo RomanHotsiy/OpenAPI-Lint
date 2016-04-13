@@ -29,3 +29,6 @@ tmp
 
 # dist dir
 dist
+
+# built json schemas
+src/schemas/*.json

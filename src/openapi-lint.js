@@ -1,14 +1,18 @@
-import runCheckers from './checkers';
-import applyRules from './rules';
+import {groupBy, mapValues} from 'lodash';
+
+import {runCheckers, getIssuesInfo} from './checkers';
 import API from './types/api';
+import chalk from 'chalk';
 
 const OpenAPILint = {
   lint(specUrl) {
     return API.create(specUrl).then((api) => {
-      var checks = runCheckers(api);
-      return applyRules(checks);
+      let checks = runCheckers(api);
+      return groupBy(checks, 'code');
     });
-  }
+  },
+
+  getIssuesInfo
 };
 
 export default OpenAPILint;

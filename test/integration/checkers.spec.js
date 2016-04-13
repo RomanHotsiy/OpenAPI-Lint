@@ -1,4 +1,4 @@
-import runCheckers from '../../src/checkers';
+import {runCheckers} from '../../src/checkers';
 import API from '../../src/types/api';
 import {cloneDeep} from 'lodash';
 
@@ -28,7 +28,9 @@ describe('Integration:', () => {
       res[0].should.be.deep.equal({
         code: 'DUPLICATE_OPERATIONID',
         message: 'Cannot have multiple operations with the same operationId: ' + operationId,
-        path: ['$', 'paths', '/pet', 'put', 'operationId']
+        params: ['addPet'],
+        path: ['paths', '/pet', 'post', 'operationId'],
+        type: 'error'
       });
     });
 
@@ -42,7 +44,9 @@ describe('Integration:', () => {
       res[0].should.be.deep.equal({
         code: 'EXTRA_REFERENCE_PROPERTIES',
         message: 'Extra JSON Reference properties will be ignored: extraField',
-        path: ['$', 'paths', '/pet', 'post', 'parameters', 0, 'schema']
+        path: ['paths', '/pet', 'post', 'parameters', '0', 'schema'],
+        params: ['extraField'],
+        type: 'warning'
       });
     });
   });

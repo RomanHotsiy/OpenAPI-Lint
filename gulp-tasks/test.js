@@ -31,5 +31,5 @@ function test(done) {
 }
 
 // Lint and run our tests
-gulp.task('test', ['lint'], test);
-gulp.task('test-browser', ['lint'], karma);
+gulp.task('test', ['build-yaml', 'lint'], test);
+gulp.task('test-browser', ['build-yaml', 'lint'], karma);

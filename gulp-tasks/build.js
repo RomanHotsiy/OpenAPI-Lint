@@ -2,6 +2,7 @@ import gulp  from 'gulp';
 import browserify from 'browserify';
 import source from 'vinyl-source-stream';
 import buffer from 'vinyl-buffer';
+import path from 'path';
 
 import config from './config';
 
@@ -23,4 +24,4 @@ function build() {
 }
 
 // Build two versions of the library
-gulp.task('build', ['lint', 'clean'], build);
+gulp.task('build', ['lint', 'build-yaml', 'clean'], build);

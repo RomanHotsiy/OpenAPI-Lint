@@ -11,8 +11,8 @@ export default class API {
   static create(specUrl) {
     let origSpec;
     let spec;
-
     return SwaggerParser.parse(specUrl)
+
       .then(_origSpec => {
         origSpec = cloneDeep(_origSpec);
         return SwaggerParser.bundle(_origSpec);
