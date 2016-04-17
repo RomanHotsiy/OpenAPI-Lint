@@ -32,10 +32,7 @@ export function runCheckers(api, checkers = ALL_CHECKERS) {
     }
 
     if (schema.$$ref && json.$ref) {
-      //console.log('llol');
-      //console.log(json.$ref);
       let subSchema = api.$refs.get(json.$ref);
-      //console.log(schema.$$ref);
       let $$ref = jp.get(schemaCopy, schema.$$ref.substr(1));
       validator.validate(subSchema, $$ref);
     }
