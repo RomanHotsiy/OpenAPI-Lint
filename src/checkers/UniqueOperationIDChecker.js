@@ -4,7 +4,7 @@ import {ISSUE_TYPE} from '../types';
 export default class UniqueOperationIDChecker extends BaseChecker {
   constructor() {
     super();
-    this.subscribeDeref(['definitions', 'operation', 'properties', 'operationId'], this.check);
+    this.subscribe(['definitions', 'operation', 'properties', 'operationId'], this.check);
 
     this.operationIDSet = new Set();
   }

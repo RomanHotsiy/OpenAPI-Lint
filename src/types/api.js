@@ -2,27 +2,21 @@ import SwaggerParser from 'swagger-parser';
 import {cloneDeep} from 'lodash';
 
 export default class API {
-  constructor(spec, specDeref, origSpec) {
+  constructor(spec, $refs) {
     this.spec = spec;
-    this.specDeref = specDeref;
-    this.origSpec = origSpec;
+    this.$refs = $refs;
   }
 
   static create(specUrl) {
-    let origSpec;
     let spec;
     return SwaggerParser.parse(specUrl)
-
-      .then(_origSpec => {
-        origSpec = cloneDeep(_origSpec);
-        return SwaggerParser.bundle(_origSpec);
-      })
       .then(_spec => {
-        spec = cloneDeep(_spec);
-        return SwaggerParser.dereference(_spec);
+        spec = _spec;
+        return SwaggerParser.resolve(spec, {$refs: {internal: true}});
       })
-      .then(specDeref => {
-        return new API(spec, specDeref, origSpec);
+      .then($refs => {
+        console.log($refs.paths());
+        return new API(spec, $refs);
       });
   }
 }

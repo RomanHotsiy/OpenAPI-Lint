@@ -119,6 +119,7 @@ definitions:
           additionalProperties:
             items: {}
   response:
+    $$ref: '#/definitions/response'
     properties:
       $ref: {}
       description: {}
@@ -149,6 +150,7 @@ definitions:
             examples:
               additionalProperties: {}
   parameter:
+    $$ref: '#/definitions/parameter'
     properties:
       $ref: {}
       description: {}
@@ -177,6 +179,7 @@ definitions:
       multipleOf: {}
       allowEmptyValue: {}
   schema:
+    $$ref: '#/definitions/schema'
     properties:
       $ref: {}
       format: {}

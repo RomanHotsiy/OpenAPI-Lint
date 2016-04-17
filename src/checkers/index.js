@@ -15,15 +15,13 @@ export var ALL_CHECKERS = [
 function registerValidators(schema, validators) {
   for (let validator of validators) {
     let subSchema = jp.get(schema, validator.pointer);
+    if (!subSchema) throw Error(`Cant resolve ${validator.pointer}`);
     subSchema.$validators || (subSchema.$validators = []);
     subSchema.$validators.push(validator.func);
   }
 }
 
 export function runCheckers(api, checkers = ALL_CHECKERS) {
-  let schemaOrig = cloneDeep(schema);
-  var schemaDeref = cloneDeep(schema);
-  let results = [];
 
   function customValidator(report, schema, json) {
     if (Array.isArray(schema.$validators)) {
@@ -32,18 +30,28 @@ export function runCheckers(api, checkers = ALL_CHECKERS) {
         if (issue) results.push(issue);
       });
     }
+
+    if (schema.$$ref && json.$ref) {
+      //console.log('llol');
+      //console.log(json.$ref);
+      let subSchema = api.$refs.get(json.$ref);
+      //console.log(schema.$$ref);
+      let $$ref = jp.get(schemaCopy, schema.$$ref.substr(1));
+      validator.validate(subSchema, $$ref);
+    }
   }
+
+  let schemaCopy = cloneDeep(schema);
+  let results = [];
 
   for (let CheckerType of checkers) {
     let checker = new CheckerType();
-    registerValidators(schemaOrig, checker.pointers);
-    registerValidators(schemaDeref, checker.pointersDeref);
+    registerValidators(schemaCopy, checker.pointers);
   }
 
   var validator = new ZSchema({ customValidator: customValidator });
 
-  validator.validate(api.spec, schemaOrig);
-  validator.validate(api.specDeref, schemaDeref);
+  var errors = validator.validate(api.spec, schemaCopy);
   return results;
 }
 

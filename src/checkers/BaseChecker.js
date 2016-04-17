@@ -4,13 +4,7 @@ import jp from 'json-pointer';
 export default class BaseChecker {
   constructor() {
     this.pointers = [];
-    this.pointersDeref = [];
-
     this.issuesInfo = this.constructor.getInfo();
-  }
-
-  subscribeDeref(pointer, func) {
-    this.pointersDeref.push({pointer, func: func.bind(this)});
   }
 
   subscribe(pointer, func) {
