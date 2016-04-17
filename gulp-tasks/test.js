@@ -1,9 +1,31 @@
 import gulp  from 'gulp';
+import fs from 'fs';
+import glob from 'glob';
+import path from 'path';
 import {Server as KarmaServer} from 'karma';
 
 import {coverage} from './coverage';
 import mochaGlobals from '../test/setup/.globals.json';
 const $ = global.$;
+
+function bundleTests() {
+  const suitesDir = path.join(__dirname, '/../test/suites');
+  const output = path.join(suitesDir, 'suites.bundle.json');
+  let res = {};
+  let specs = glob.sync(path.join(suitesDir, '!(*.expected|*.bundle).json'));
+  for (let specFile of specs) {
+    let basename = path.basename(specFile, '.json');
+    res[basename] = JSON.parse(fs.readFileSync(specFile));
+    let expectedFile = path.join(suitesDir, basename + '.expected.json');
+    let expected = null;
+    try {
+      fs.statSync(expectedFile);
+      expected = JSON.parse(fs.readFileSync(expectedFile));
+    } catch(e) {};
+    res[basename].expected = expected;
+  }
+  fs.writeFileSync(output, JSON.stringify(res));
+}
 
 export function mocha() {
   require('babel-register');
@@ -23,6 +45,7 @@ function karma(done) {
 };
 
 function test(done) {
+  bundleTests();
   if (process.env.KARMA) {
     karma(done);
   } else {

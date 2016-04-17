@@ -1,7 +1,7 @@
 global.chai = require('chai');
 global.sinon = require('sinon');
 global.chai.use(require('sinon-chai'));
-
+global.suitesInfo = require('../suites/suites.bundle.json');
 require('babel-core/register');
 require('./setup')();
 

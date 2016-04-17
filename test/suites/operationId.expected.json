@@ -1,0 +1,18 @@
+{
+  "DUPLICATE_OPERATIONID": [
+    {
+      "code": "DUPLICATE_OPERATIONID",
+      "params": [
+        "addPet"
+      ],
+      "type": "error",
+      "message": "Cannot have multiple operations with the same operationId: addPet",
+      "path": [
+        "paths",
+        "/pet",
+        "post",
+        "operationId"
+      ]
+    }
+  ]
+}

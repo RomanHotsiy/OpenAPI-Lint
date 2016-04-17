@@ -1,0 +1,20 @@
+{
+  "EXTRA_REFERENCE_PROPERTIES": [
+    {
+      "code": "EXTRA_REFERENCE_PROPERTIES",
+      "params": [
+        "extraField"
+      ],
+      "type": "warning",
+      "message": "Extra JSON Reference properties will be ignored: extraField",
+      "path": [
+        "paths",
+        "/pet",
+        "put",
+        "parameters",
+        "0",
+        "schema"
+      ]
+    }
+  ]
+}

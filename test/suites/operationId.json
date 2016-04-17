@@ -1,0 +1,12 @@
+{
+  "title": "multiple operations with the same operationId",
+  "patch": {
+    "paths": {
+      "/pet": {
+        "put": {
+          "operationId": "addPet"
+        }
+      }
+    }
+  }
+}

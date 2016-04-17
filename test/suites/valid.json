@@ -1,0 +1,4 @@
+{
+  "title": "Should return empty array for valid spec",
+  "patch": {}
+}

@@ -1,0 +1,18 @@
+{
+  "title": "extra reference properties",
+  "patch": {
+    "paths": {
+      "/pet": {
+        "put": {
+          "parameters": {
+            "0": {
+              "schema": {
+                "extraField": "test"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
