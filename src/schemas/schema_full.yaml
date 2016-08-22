@@ -1,417 +1,260 @@
-# Forbiden: `anyOf`, `oneOf`, `not`, array as `type` value and extenal `$ref`s.
-# Extensions: `typeSwitch`, `valueSwitch`, `$$ref` and `???`.
 #FIXME: check all JSON refs
-title: A JSON Schema for Swagger 2.0 API.
-id: 'http://swagger.io/v2/schema.json#'
-$schema: 'http://json-schema.org/draft-04/schema#'
-# Swagger Object
+title: A JSON Model for Swagger 2.0 API.
 # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#swagger-object
 description: This is the root document object for the API specification.
-type: object
-required:
-  - swagger
-  - info
-  - paths
-properties:
-  swagger:
-    description: The Swagger version of this document.
-    enum: ['2.0']
-  info:
-    $ref: '#/definitions/info'
-  host:
-    description: "The host (name or ip) of the API. Example: 'swagger.io'"
-    type: string
-    pattern: "^[^{}/ :\\\\]+(?::\\d+)?$"
-  basePath:
-    description: "The base path to the API. Example: '/api'."
-    type: string
-    pattern: '^/'
-  schemes:
-    $ref: '#/definitions/schemesList'
-  consumes:
-    description: A list of MIME types accepted by the API.
-    allOf:
-      - $ref: '#/definitions/mediaTypeList'
-  produces:
-    description: A list of MIME types the API can produce.
-    allOf:
-      - $ref: '#/definitions/mediaTypeList'
-  paths:
-    $ref: '#/definitions/paths'
-  definitions:
-    $ref: '#/definitions/definitions'
-  parameters:
-    $ref: '#/definitions/parametersDefinitions'
-  responses:
-    $ref: '#/definitions/responsesDefinitions'
-  securityDefinitions:
-    $ref: '#/definitions/securityDefinitions'
-  security:
-    $ref: '#/definitions/security'
-  tags:
-    type: array
-    items:
-      $ref: '#/definitions/tag'
-    uniqueItems: true
-  externalDocs:
-    $ref: '#/definitions/externalDocs'
-allOf:
-  - $ref: '#/definitions/vendorExtensions'
-additionalProperties: false
+'{swagger}!':
+  description: The Swagger version of this document.
+  enum: ['2.0']
+'{info}!': '#/definitions/info'
+'{host}':
+  description: "The host (name or ip) of the API. Example: 'swagger.io'"
+  type: string
+  pattern: "^[^{}/ :\\\\]+(?::\\d+)?$"
+'{basePath}':
+  description: "The base path to the API. Example: '/api'."
+  type: string
+  pattern: '^/'
+'{schemes}': '#/definitions/schemesList'
+'{consumes}':
+  description: A list of MIME types accepted by the API.
+  extends: '#/definitions/mediaTypeList'
+'{produces}':
+  description: A list of MIME types the API can produce.
+  extends: '#/definitions/mediaTypeList'
+'{paths}!': '#/definitions/paths'
+'{definitions}': '#/definitions/definitions'
+'{parameters}': '#/definitions/parametersDefinitions'
+'{responses}': '#/definitions/responsesDefinitions'
+'{securityDefinitions}': '#/definitions/securityDefinitions'
+'{security}': '#/definitions/security'
+'{tags}':
+  '[0..]': '#/definitions/tag'
+  uniqueItems: true
+'{externalDocs}': '#/definitions/externalDocs'
+'{/^x-/}': '#/definitions/vendorExtension'
+#FIXME
 definitions:
   # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#infoObject
   info:
     description: General information about the API.
-    type: object
-    required:
-      - version
-      - title
-    properties:
-      title:
-        description: A unique and precise title of the API.
-        type: string
-      description:
-        description: A longer description of the API. Should be different from the title.  GitHub Flavored Markdown is allowed.
-        type: string
-      termsOfService:
-        description: The terms of service for the API.
-        type: string
-      contact:
-        $ref: '#/definitions/contact'
-      license:
-        $ref: '#/definitions/license'
-      version:
-        description: A semantic version number of the API.
-        type: string
-    allOf:
-      - $ref: '#/definitions/vendorExtensions'
-    additionalProperties: false
+    '{title}!':
+      description: A unique and precise title of the API.
+      type: string
+    '{description}':
+      description: A longer description of the API. Should be different from the title.  GitHub Flavored Markdown is allowed.
+      type: string
+    '{termsOfService}':
+      description: The terms of service for the API.
+      type: string
+    '{contact}': '#/definitions/contact'
+    '{license}': '#/definitions/license'
+    '{version}!':
+      description: A semantic version number of the API.
+      type: string
+    '{/^x-/}': '#/definitions/vendorExtension'
   # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#contact-object
   contact:
     description: Contact information for the owners of the API.
-    type: object
-    properties:
-      name:
-        description: The identifying name of the contact person/organization.
-        type: string
-      url:
-        description: The URL pointing to the contact information.
-        type: string
-        #FIXME: check
-        format: uri
-      email:
-        description: The email address of the contact person/organization.
-        type: string
-        #FIXME: check
-        format: email
-    allOf:
-      - $ref: '#/definitions/vendorExtensions'
-    additionalProperties: false
+    '{name}':
+      description: The identifying name of the contact person/organization.
+      type: string
+    '{url}':
+      description: The URL pointing to the contact information.
+      extends: '#/definitions/UrlString'
+    '{email}':
+      description: The email address of the contact person/organization.
+      type: string
+      #FIXME: check
+      format: email
+    '{/^x-/}': '#/definitions/vendorExtension'
   # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#license-object
   license:
     description: License information for the exposed API.
-    type: object
-    required:
-      - name
-    properties:
-      name:
-        description: "The name of the license type. It's encouraged to use an OSI compatible license."
-        type: string
-      url:
-        description: The URL pointing to the license.
-        type: string
-        format: uri
-    allOf:
-      - $ref: '#/definitions/vendorExtensions'
-    additionalProperties: false
+    '{name}!':
+      description: "The name of the license type. It's encouraged to use an OSI compatible license."
+      type: string
+    '{url}':
+      description: The URL pointing to the license.
+      extends: '#/definitions/UrlString'
+    '{/^x-/}': '#/definitions/vendorExtension'
   # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#paths-object
   paths:
     description: "Relative paths to the individual endpoints. They must be relative to the 'basePath'."
-    type: object
-    patternProperties:
-      ^/:
-        $ref: '#/definitions/pathItem'
-    allOf:
-      - $ref: '#/definitions/vendorExtensions'
-    additionalProperties: false
+    '{/^\//}': '#/definitions/pathItem'
+    '{/^x-/}': '#/definitions/vendorExtension'
   # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#path-item-object
   pathItem:
     description: Describes the operations available on a single path.
-    type: object
-    $$ref: '#/definitions/pathItem'
-    properties:
-      get:
-        $ref: '#/definitions/operation'
-      put:
-        $ref: '#/definitions/operation'
-      post:
-        $ref: '#/definitions/operation'
-      delete:
-        $ref: '#/definitions/operation'
-      options:
-        $ref: '#/definitions/operation'
-      head:
-        $ref: '#/definitions/operation'
-      patch:
-        $ref: '#/definitions/operation'
-      parameters:
-        $ref: '#/definitions/parametersList'
-    allOf:
-      - $ref: '#/definitions/vendorExtensions'
-    additionalProperties: false
+    'switch{$ref}!':
+      #TODO: validate external
+      '@string': {}
+      #FIXME: think
+      '=undefined':
+        '{get}': '#/definitions/operation'
+        '{put}': '#/definitions/operation'
+        '{post}': '#/definitions/operation'
+        '{delete}': '#/definitions/operation'
+        '{options}': '#/definitions/operation'
+        '{head}': '#/definitions/operation'
+        '{patch}': '#/definitions/operation'
+        '{parameters}': '#/definitions/parametersList'
+        '{/^x-/}': '#/definitions/vendorExtension'
   # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#operation-object
   operation:
     description: Describes a single API operation on a path.
-    type: object
-    required:
-      - responses
-    properties:
-      tags:
-        description: A list of tags for API documentation control.
-        type: array
-        items:
-          type: string
-        uniqueItems: true
-      summary:
-        description: A brief summary of the operation.
-        type: string
-      description:
-        description: 'A longer description of the operation, GitHub Flavored Markdown is allowed.'
-        type: string
-      externalDocs:
-        $ref: '#/definitions/externalDocs'
-      operationId:
-        description: A unique identifier of the operation.
-        type: string
-      produces:
-        description: A list of MIME types the API can produce.
-        allOf:
-          - $ref: '#/definitions/mediaTypeList'
-      consumes:
-        description: A list of MIME types the API can consume.
-        allOf:
-          - $ref: '#/definitions/mediaTypeList'
-      parameters:
-        $ref: '#/definitions/parametersList'
-      responses:
-        $ref: '#/definitions/responses'
-      schemes:
-        $ref: '#/definitions/schemesList'
-      deprecated:
-        description: 'Declares this operation to be deprecated.'
-        type: boolean
-        default: false
-      security:
-        $ref: '#/definitions/security'
-    allOf:
-      - $ref: '#/definitions/vendorExtensions'
-    additionalProperties: false
+    '{tags}':
+      description: A list of tags for API documentation control.
+      '[0..]': '@string'
+      uniqueItems: true
+    '{summary}':
+      description: A brief summary of the operation.
+      type: string
+    '{description}':
+      description: 'A longer description of the operation, GitHub Flavored Markdown is allowed.'
+      type: string
+    '{externalDocs}': '#/definitions/externalDocs'
+    '{operationId}':
+      description: A unique identifier of the operation.
+      type: string
+    '{produces}':
+      description: A list of MIME types the API can produce.
+      extends: '#/definitions/mediaTypeList'
+    '{consumes}':
+      description: A list of MIME types the API can consume.
+      extends: '#/definitions/mediaTypeList'
+    '{parameters}': '#/definitions/parametersList'
+    '{responses}!': '#/definitions/responses'
+    '{schemes}': '#/definitions/schemesList'
+    '{deprecated}':
+      description: 'Declares this operation to be deprecated.'
+      type: boolean
+      default: false
+    '{security}': '#/definitions/security'
+    '{/^x-/}': '#/definitions/vendorExtension'
   # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#external-documentation-object
   externalDocs:
     description: information about external documentation
-    type: object
-    required:
-      - url
-    properties:
-      description:
-        type: string
-      url:
-        type: string
-        format: uri
+    '{description}': '@string'
+    '{url}!': '#/definitions/UrlString'
   # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#parameter-object
   parameter:
-    type: object
-    required:
-      - name
-      - in
-      - type
-    properties:
-      name:
-        description: The name of the parameter.
-        type: string
-      in:
-        description: Determines the location of the parameter.
-      description:
-        description: A brief description of the parameter. This could contain examples of use.
-        type: string
-      required:
-        description: Determines whether or not this parameter is required or optional.
-        type: boolean
-        default: false
-    valueSwitch:
-      property: in
-      values:
-        body:
-          required:
-            - schema
-          properties:
-            schema:
-              $ref: '#/definitions/schema'
-        query:
-          allOf:
-            - $ref: '#/definitions/allowEmptyValueMixin'
-            - $ref: '#/definitions/stringifyValueMixin'
-        header:
-          allOf:
-            - $ref: '#/definitions/stringifyValueMixin'
-        path:
-          required:
-            - required
-          properties:
-            required:
-              enum: [true]
-          allOf:
-            - $ref: '#/definitions/stringifyValueMixin'
-        formData:
-          required:
-            - type
-          valueSwitch:
-            property: type
-            values:
-              file: {}
-            default:
-              allOf:
-                - $ref: '#/definitions/allowEmptyValueMixin'
-                - $ref: '#/definitions/stringifyValueMixin'
-    allOf:
-      - $ref: '#/definitions/vendorExtensions'
+    '{name}!':
+      description: The name of the parameter.
+      type: string
+    '{description}':
+      description: A brief description of the parameter. This could contain examples of use.
+      type: string
+    '{required}':
+      description: Determines whether or not this parameter is required or optional.
+      type: boolean
+      default: false
+    'switch{in}!':
+      description: Determines the location of the parameter.
+      '="body"':
+        '{schema}!': '#/definitions/schema'
+      '="query"':
+        extends: '#/definitions/stringifyValueMixin'
+        allOf:
+          - $ref: '#/definitions/allowEmptyValueMixin'
+      '="header"':
+        extends: '#/definitions/stringifyValueMixin'
+      '="path"':
+        extends: '#/definitions/stringifyValueMixin'
+        '{required}!': '=true'
+      '="formData"':
+        'switch{type}!':
+          '="file"': {}
+          default:
+            extends: '#/definitions/stringifyValueMixin'
+            allOf:
+              - $ref: '#/definitions/allowEmptyValueMixin'
+    '{/^x-/}': '#/definitions/vendorExtension'
     #FIXME: should be recursive
-    additionalProperties: false
   # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#items-object
   primitivesItems:
-    allOf:
-      - $ref: '#/definitions/stringifyValueMixin'
-      - $ref: '#/definitions/vendorExtensions'
-    additionalProperties: false
+    extends: '#/definitions/stringifyValueMixin'
+    '{/^x-/}': '#/definitions/vendorExtension'
   # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#responses-object
   responses:
     description: "Response objects names can either be any valid HTTP status code or 'default'."
-    type: object
-    patternProperties:
-      '^[0-9]{3}$|^default$':
-        $$ref: '#/definitions/response'
-        allOf:
-          - $ref: '#/definitions/response'
-    allOf:
-      - $ref: '#/definitions/vendorExtensions'
-    additionalProperties: false
-    #FIXME: check that atleast one non vendor property
+    '{default}': '#/definitions/response'
+    #$$ref: '#/definitions/response'
+    '{/[0-9]{3}/}':'#/definitions/response'
+    #$$ref: '#/definitions/response'
+    #FIXME: custom error
+    # The Responses Object MUST contain at least one response code, and it SHOULD be the response for a successful operation call.
+    '{/^x-/}': '#/definitions/vendorExtension'
   # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#response-object
   response:
-    type: object
-    required:
-      - description
-    properties:
-      description:
-        type: string
-      schema:
-        $ref: '#/definitions/fileSchema'
-      headers:
-        $ref: '#/definitions/headers'
-      examples:
-        $ref: '#/definitions/examples'
-    allOf:
-      - $ref: '#/definitions/vendorExtensions'
-    additionalProperties: false
+    '{description}!': '@string'
+    '{schema}':
+      mixin: '#/definitions/schema'
+      'switch{type}':
+        #TODO: not all constrain make sence  for e.g. xml
+        '="file"': {}
+    '{headers}': '#/definitions/headers'
+    '{examples}': '#/definitions/examples'
+    '{/^x-/}': '#/definitions/vendorExtension'
   # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#headers-object
   headers:
-    type: object
-    additionalProperties:
-      $ref: '#/definitions/header'
+    '{*}': '#/definitions/header'
   # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#headers-object
   examples:
-    type: object
-    additionalProperties: true
+    '{*}': '@any'
   # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#header-object
   header:
-    type: object
-    properties:
-      description:
-        type: string
-    allOf:
-      - $ref: '#/definitions/stringifyValueMixin'
-      - $ref: '#/definitions/vendorExtensions'
-    additionalProperties: false
+    '{description}': '@string'
+    'extends': '#/definitions/stringifyValueMixin'
+    '{/^x-/}': '#/definitions/vendorExtension'
   # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#tag-object
   tag:
-    type: object
-    additionalProperties: false
-    required:
-      - name
-    properties:
-      name:
-        type: string
-      description:
-        type: string
-      externalDocs:
-        $ref: '#/definitions/externalDocs'
-    allOf:
-      - $ref: '#/definitions/vendorExtensions'
-    additionalProperties: false
+    '{name}!': '@string'
+    '{description}': '@string'
+    '{externalDocs}': '#/definitions/externalDocs'
+    '{/^x-/}': '#/definitions/vendorExtension'
   # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#schema-object
   schema:
     description: A deterministic version of a JSON Schema object.
-    type: object
     $$ref: '#/definitions/schema'
-    properties:
-      #copied from https://github.com/json-schema/json-schema/blob/master/draft-04/schema
-      title:
-        type: string
-      description:
-        type: string
-      type:
-        $ref: 'http://json-schema.org/draft-04/schema#/properties/type'
-      items:
-        typeSwitch:
-          array:
-            minItems: 1
-            items:
-              $ref: '#/definitions/schema'
-          object:
-            $ref: '#/definitions/schema'
-        default: {}
-      allOf:
-        type: array
-        minItems: 1
-        items:
-          $ref: '#/definitions/schema'
-      #Keywods specific for object type
-      required:
-        type: array
-        items:
-          type: string
-        minItems: 1
-        uniqueItems: true
-      properties:
-        type: object
-        additionalProperties:
-          $ref: '#/definitions/schema'
-        default: {}
-      additionalProperties:
-        typeSwitch:
-          boolean: {}
-          object:
-            $ref: '#/definitions/schema'
-        default: {}
-      maxProperties:
-        type: integer
-        minimum: 0
-      minProperties:
-        type: integer
-        minimum: 0
-        default: 0
-      # Swagger extensions
-      #
-      discriminator:
-        type: string
-      readOnly:
-        type: boolean
-        default: false
-      xml:
-        $ref: '#/definitions/xml'
-      externalDocs:
-        $ref: '#/definitions/externalDocs'
-      example: {}
+    #copied from https://github.com/json-schema/json-schema/blob/master/draft-04/schema
+    '{title}': '@string'
+    '{description}': '@string'
+    'switch{type}':
+      '="array"':
+        'switch{items}!':
+          '@array':
+            '[0..]!': '#/definitions/schema'
+          '@object': '#/definitions/schema'
+      '="object"':
+        '{required}':
+          '[0..]!': '@string'
+          uniqueItems: true
+        '{properties}':
+          '{*}': '#/definitions/schema'
+          default: {}
+        '{additionalProperties}':
+          switch:
+            '@boolean': {}
+            '@object': '#/definitions/schema'
+          default: {}
+        '{maxProperties}':
+          type: integer
+          '>=': 0
+        '{minProperties}':
+          type: integer
+          '>=': 0
+          default: 0
+    '{allOf}':
+      '[0..]!': '#/definitions/schema'
+    # Swagger extensions
+    '{discriminator}': '@string'
+    '{readOnly}':
+      type: boolean
+      default: false
+    '{xml}': '#/definitions/xml'
+    '{externalDocs}': '#/definitions/externalDocs'
+    '{example}': {}
+    '{/^x-/}': '#/definitions/vendorExtension'
     allOf:
       - $ref: '#/definitions/jsonSchemaFormatMixin'
       - $ref: '#/definitions/jsonSchemaEnumMixin'
@@ -419,131 +262,81 @@ definitions:
       - $ref: '#/definitions/jsonSchemaArrayConstraintsMixin'
       - $ref: '#/definitions/jsonSchemaStringConstraintsMixin'
       - $ref: '#/definitions/jsonSchemaNumberConstraintsMixin'
-      - $ref: '#/definitions/vendorExtensions'
-    additionalProperties: false
   # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#xml-object
   xml:
-    type: object
-    properties:
-      name:
-        type: string
-      namespace:
-        type: string
-      prefix:
-        type: string
-      attribute:
-        type: boolean
-        default: false
-      wrapped:
-        type: boolean
-        default: false
-    allOf:
-      - $ref: '#/definitions/vendorExtensions'
-    additionalProperties: false
+    '{name}': '@string'
+    '{namespace}': '@string'
+    '{prefix}': '@string'
+    '{attribute}':
+      type: boolean
+      default: false
+    '{wrapped}':
+      type: boolean
+      default: false
+    '{/^x-/}': '#/definitions/vendorExtension'
   # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#definitions-object
   definitions:
     description: One or more JSON objects describing the schemas being consumed and produced by the API.
-    type: object
-    additionalProperties:
-      $ref: '#/definitions/schema'
+    '{*}': '#/definitions/schema'
   # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#parameters-definitions-object
   parametersDefinitions:
     description: One or more JSON representations for parameters
-    type: object
-    additionalProperties:
-      $ref: '#/definitions/parameter'
+    '{*}': '#/definitions/parameter'
   # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#responses-definitions-object
   responsesDefinitions:
     description: One or more JSON representations for parameters
-    type: object
-    additionalProperties:
-      $ref: '#/definitions/response'
+    '{*}': '#/definitions/response'
   # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#security-definitions-object
   securityDefinitions:
-    type: object
-    additionalProperties:
-      $ref: '#/definitions/securityScheme'
+    '{*}': '#/definitions/securityScheme'
   # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#security-scheme-object
   securityScheme:
-    type: object
-    required:
-      - type
-    properties:
-      type: {}
-      description:
-        type: string
-    valueSwitch:
-      property: type
-      values:
-        basic: {}
-        apiKey:
-          required:
-            - name
-            - in
-          properties:
-            name:
-              type: string
-            in:
-              type: string
-              enum:
-                - header
-                - query
-        oauth2:
-          required:
-            - flow
-            - scopes
-          properties:
-            flow: {}
-            scopes:
-              $ref: '#/definitions/oauth2Scopes'
-          valueSwitch:
-            property: flow
-            values:
-              implicit:
-                $ref: '#/definitions/oauth2AuthorizationUrlMixin'
-              password:
-                $ref: '#/definitions/oauth2TokenUrlMixin'
-              application:
-                $ref: '#/definitions/oauth2TokenUrlMixin'
-              accessCode:
-                allOf:
-                  - $ref: '#/definitions/oauth2AuthorizationUrlMixin'
-                  - $ref: '#/definitions/oauth2TokenUrlMixin'
-
-    allOf:
-      - $ref: '#/definitions/vendorExtensions'
-    additionalProperties: false
+    '{description}': '@string'
+    'switch{type}!':
+      '="basic"': {}
+      '="apiKey"':
+        '{name}!': '@string'
+        '{in}!':
+          enum: ['header', 'query']
+      '="oauth2"':
+        '{scopes}!': '#/definitions/oauth2Scopes'
+        'switch{flow}!':
+          '="implicit"':
+            '{authorizationUrl}!':'#/definitions/UrlString'
+          '="password"':
+            '{tokenUrl}!': '#/definitions/UrlString'
+          '="application"':
+            '{tokenUrl}!': '#/definitions/UrlString'
+          '="accessCode"':
+            '{authorizationUrl}!':'#/definitions/UrlString'
+            '{tokenUrl}!': '#/definitions/UrlString'
+    '{/^x-/}': '#/definitions/vendorExtension'
   # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#scopes-object
   oauth2Scopes:
-    type: object
-    additionalProperties:
-      type: string
+    '{*}': '@string'
   # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#security-requirement-object
   securityRequirement:
-    type: object
-    additionalProperties:
-      type: array
-      items:
-        type: string
+    '{*}':
+      '[0..]': '@string'
       uniqueItems: true
   # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#specification-extensions
-  specificationExtensions:
-    description: Specification Extensions to the Swagger Schema.
-    patternProperties:
-      ^x-: {}
+  vendorExtension:
+    description: Specification Extension to the Swagger Schema.
+    type: any
 ##
+  UrlString:
+    type: string
+    format: uri
   parametersList:
     description: The parameters needed to send a valid API call.
-    type: array
-    items:
+    '[0..]':
       #FIXME: $ref isn't valid parameter. How to handle?
       $$ref: '#/definitions/parameter'
       allOf:
         $ref: '#/definitions/parameter'
     uniqueItems: true
   mediaTypeList:
-    type: array
-    items:
+    '[0..]':
       description: The MIME type of the HTTP message.
       type: string
     uniqueItems: true
@@ -559,15 +352,9 @@ definitions:
     properties:
       type: {}
       collectionFormat:
-        type: string
         #FIXME: check that only 'query' and 'formData' have 'multi' on top level
         #check that on the same level in === 'query or in === 'formData'
-        enum:
-          - csv
-          - ssv
-          - tsv
-          - pipes
-          - multi
+        enum: ['csv', 'ssv', 'tsv', 'pipes', 'multi']
         default: csv
     valueSwitch:
       property: type
@@ -592,114 +379,54 @@ definitions:
       - $ref: '#/definitions/jsonSchemaEnumMixin'
       - $ref: '#/definitions/jsonSchemaDefaultMixin'
   jsonSchemaFormatMixin:
-    properties:
-      format:
-        type: string
+    '{format}': '@string'
   jsonSchemaEnumMixin:
-    properties:
-      enum:
-        type: array
-        items: {}
-        minItems: 1
-        uniqueItems: true
+    '{enum}':
+      '[0..]!': {}
+      uniqueItems: true
   jsonSchemaDefaultMixin:
-    properties:
-      default: {}
+    '{default}': {}
   jsonSchemaArrayConstraintsMixin:
-    properties:
-      maxItems:
-        type: integer
-        minimum: 0
-      minItems:
-        type: integer
-        minimum: 0
-        default: 0
-      uniqueItems:
-        type: boolean
-        default: false
+    '{maxItems}':
+      type: integer
+      '>=': 0
+    '{minItems}':
+      type: integer
+      '>=': 0
+      default: 0
+    '{uniqueItems}':
+      type: boolean
+      default: false
   jsonSchemaStringConstraintsMixin:
-    properties:
-      maxLength:
-        type: integer
-        minimum: 0
-      minLength:
-        type: integer
-        minimum: 0
-        default: 0
-      pattern:
-        type: string
-        format: regex
+    '{maxLength}':
+      type: integer
+      '>=': 0
+    '{minLength}':
+      type: integer
+      '>=': 0
+      default: 0
+    '{pattern}':
+      type: string
+      format: regex
   jsonSchemaNumberConstraintsMixin:
-    properties:
-      multipleOf:
-        type: number
-        minimum: 0
-        exclusiveMinimum: true
-      maximum:
-        type: number
-      exclusiveMaximum:
-        type: boolean
-        default: false
-      minimum:
-        type: number
-      exclusiveMinimum:
-        type: boolean
-        default: false
-  fileSchema:
-    description: A deterministic version of a JSON Schema object.
-    type: object
-    valueSwitch:
-      property: type
-      values:
-        file:
-          required:
-            - type
-          properties:
-            title:
-              type: string
-            description:
-              type: string
-            type:
-              enum:
-                - file
-            externalDocs:
-              $ref: '#/definitions/externalDocs'
-            example: {}
-          allOf:
-            - $ref: '#/definitions/vendorExtensions'
-          additionalProperties: false
-        default:
-          $ref: '#/definitions/schema'
-    allOf:
-      - $ref: '#/definitions/jsonSchemaFormatMixin'
-      - $ref: '#/definitions/jsonSchemaDefaultMixin'
-  oauth2AuthorizationUrlMixin:
-    required:
-      - authorizationUrl
-    properties:
-      authorizationUrl:
-        type: string
-        format: uri
-  oauth2TokenUrlMixin:
-    required:
-      - tokenUrl
-    properties:
-      tokenUrl:
-        type: string
-        format: uri
+    '{multipleOf}':
+      type: number
+      '>': 0
+    'switch{maximum}':
+      '@number':
+        '{exclusiveMaximum}':
+          type: boolean
+          default: false
+    'switch{minimum}':
+      '@number':
+        '{exclusiveMinimum}':
+          type: boolean
+          default: false
   security:
-    type: array
-    items:
-      $ref: '#/definitions/securityRequirement'
+    '[0..]': '#/definitions/securityRequirement'
     uniqueItems: true
   schemesList:
-    type: array
     description: The transfer protocol of the API.
-    items:
-      type: string
-      enum:
-        - http
-        - https
-        - ws
-        - wss
+    '[0..]':
+      enum: ['http', 'https', 'ws', 'wss']
     uniqueItems: true
