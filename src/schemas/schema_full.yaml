@@ -8,13 +8,15 @@ description: This is the root document object for the API specification.
 '{info}!': '#/definitions/info'
 '{host}':
   description: "The host (name or ip) of the API. Example: 'swagger.io'"
-  type: string
-  pattern: "^[^{}/ :\\\\]+(?::\\d+)?$"
+  glob: '+([^{} :\\])?(:+([0-9]))'
 '{basePath}':
   description: "The base path to the API. Example: '/api'."
-  type: string
-  pattern: '^/'
-'{schemes}': '#/definitions/schemesList'
+  glob: '/*'
+'{schemes}':
+  description: The transfer protocol of the API.
+  '[0..]':
+    enum: ['http', 'https', 'ws', 'wss']
+  uniqueItems: true
 '{consumes}':
   description: A list of MIME types accepted by the API.
   extends: '#/definitions/mediaTypeList'
@@ -22,18 +24,26 @@ description: This is the root document object for the API specification.
   description: A list of MIME types the API can produce.
   extends: '#/definitions/mediaTypeList'
 '{paths}!': '#/definitions/paths'
-'{definitions}': '#/definitions/definitions'
-'{parameters}': '#/definitions/parametersDefinitions'
-'{responses}': '#/definitions/responsesDefinitions'
-'{securityDefinitions}': '#/definitions/securityDefinitions'
+'{definitions}':
+  # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#definitions-object
+  description: One or more JSON objects describing the schemas being consumed and produced by the API.
+  '{*}': '#/definitions/schema'
+'{parameters}':
+  # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#parameters-definitions-object
+  '{*}': '#/definitions/parameterDefinition'
+'{responses}':
+  # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#responses-definitions-object
+  '{*}': '#/definitions/responseDefinition'
+'{securityDefinitions}':
+  # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#security-definitions-object
+  '{*}': '#/definitions/securityScheme'
 '{security}': '#/definitions/security'
 '{tags}':
   '[0..]': '#/definitions/tag'
   uniqueItems: true
 '{externalDocs}': '#/definitions/externalDocs'
-'{/^x-/}': '#/definitions/vendorExtension'
-#FIXME
-definitions:
+'{/x-*/}': '#/definitions/vendorExtension'
+models:
   # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#infoObject
   info:
     description: General information about the API.
@@ -51,7 +61,7 @@ definitions:
     '{version}!':
       description: A semantic version number of the API.
       type: string
-    '{/^x-/}': '#/definitions/vendorExtension'
+    '{/x-*/}': '#/definitions/vendorExtension'
   # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#contact-object
   contact:
     description: Contact information for the owners of the API.
@@ -60,13 +70,13 @@ definitions:
       type: string
     '{url}':
       description: The URL pointing to the contact information.
-      extends: '#/definitions/UrlString'
+      extends: '#/definitions/urlString'
     '{email}':
       description: The email address of the contact person/organization.
       type: string
       #FIXME: check
       format: email
-    '{/^x-/}': '#/definitions/vendorExtension'
+    '{/x-*/}': '#/definitions/vendorExtension'
   # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#license-object
   license:
     description: License information for the exposed API.
@@ -75,30 +85,32 @@ definitions:
       type: string
     '{url}':
       description: The URL pointing to the license.
-      extends: '#/definitions/UrlString'
-    '{/^x-/}': '#/definitions/vendorExtension'
+      extends: '#/definitions/urlString'
+    '{/x-*/}': '#/definitions/vendorExtension'
   # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#paths-object
   paths:
     description: "Relative paths to the individual endpoints. They must be relative to the 'basePath'."
-    '{/^\//}': '#/definitions/pathItem'
-    '{/^x-/}': '#/definitions/vendorExtension'
+    '{//*/}': '#/definitions/pathItem'
+    '{/x-*/}': '#/definitions/vendorExtension'
   # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#path-item-object
   pathItem:
     description: Describes the operations available on a single path.
     'switch{$ref}!':
-      #TODO: validate external
-      '@string': {}
-      #FIXME: think
-      '=undefined':
-        '{get}': '#/definitions/operation'
-        '{put}': '#/definitions/operation'
-        '{post}': '#/definitions/operation'
-        '{delete}': '#/definitions/operation'
-        '{options}': '#/definitions/operation'
-        '{head}': '#/definitions/operation'
-        '{patch}': '#/definitions/operation'
-        '{parameters}': '#/definitions/parametersList'
-        '{/^x-/}': '#/definitions/vendorExtension'
+      '@string':
+        format: 'url'
+      'undefined': '#/definitions/pathItemValue'
+  pathItemValue:
+    '{get}': '#/definitions/operation'
+    '{put}': '#/definitions/operation'
+    '{post}': '#/definitions/operation'
+    '{delete}': '#/definitions/operation'
+    '{options}': '#/definitions/operation'
+    '{head}': '#/definitions/operation'
+    '{patch}': '#/definitions/operation'
+    '{parameters}':
+      '[0..]': '#/definitions/parameter'
+      uniqueItems: true
+    '{/x-*/}': '#/definitions/vendorExtension'
   # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#operation-object
   operation:
     description: Describes a single API operation on a path.
@@ -122,7 +134,10 @@ definitions:
     '{consumes}':
       description: A list of MIME types the API can consume.
       extends: '#/definitions/mediaTypeList'
-    '{parameters}': '#/definitions/parametersList'
+    '{parameters}':
+      description: The parameters needed to send a valid API call.
+      '[0..]': '#/definitions/parameter'
+      uniqueItems: true
     '{responses}!': '#/definitions/responses'
     '{schemes}': '#/definitions/schemesList'
     '{deprecated}':
@@ -130,14 +145,18 @@ definitions:
       type: boolean
       default: false
     '{security}': '#/definitions/security'
-    '{/^x-/}': '#/definitions/vendorExtension'
+    '{/x-*/}': '#/definitions/vendorExtension'
   # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#external-documentation-object
   externalDocs:
     description: information about external documentation
     '{description}': '@string'
-    '{url}!': '#/definitions/UrlString'
+    '{url}!': '#/definitions/urlString'
   # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#parameter-object
   parameter:
+    'switch{$ref}!':
+      '@string': '#/definitions/jsonPointer'
+      'undefined': '#/definitions/parameterDefinition'
+  parameterDefinition:
     '{name}!':
       description: The name of the parameter.
       type: string
@@ -153,39 +172,42 @@ definitions:
       '="body"':
         '{schema}!': '#/definitions/schema'
       '="query"':
-        extends: '#/definitions/stringifyValueMixin'
-        allOf:
-          - $ref: '#/definitions/allowEmptyValueMixin'
+        extends: '#/definitions/stringifyValueMixinWithMultiArraySupport'
+        '{allowEmptyValue}': '#/definitions/allowEmptyValue'
       '="header"':
         extends: '#/definitions/stringifyValueMixin'
       '="path"':
-        extends: '#/definitions/stringifyValueMixin'
         '{required}!': '=true'
+        extends: '#/definitions/stringifyValueMixin'
       '="formData"':
         'switch{type}!':
           '="file"': {}
           default:
-            extends: '#/definitions/stringifyValueMixin'
-            allOf:
-              - $ref: '#/definitions/allowEmptyValueMixin'
-    '{/^x-/}': '#/definitions/vendorExtension'
-    #FIXME: should be recursive
+            '{allowEmptyValue}': '#/definitions/allowEmptyValue'
+            extends: '#/definitions/stringifyValueMixinWithMultiArraySupport'
+    '{/x-*/}': '#/definitions/vendorExtension'
+  allowEmptyValue:
+    description: allows sending a parameter by name only or with an empty value.
+    type: boolean
+    default: false
   # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#items-object
   primitivesItems:
     extends: '#/definitions/stringifyValueMixin'
-    '{/^x-/}': '#/definitions/vendorExtension'
+    '{/x-*/}': '#/definitions/vendorExtension'
   # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#responses-object
   responses:
     description: "Response objects names can either be any valid HTTP status code or 'default'."
     '{default}': '#/definitions/response'
-    #$$ref: '#/definitions/response'
-    '{/[0-9]{3}/}':'#/definitions/response'
-    #$$ref: '#/definitions/response'
+    '{/[0-9][0-9][0-9]/}': '#/definitions/response'
     #FIXME: custom error
     # The Responses Object MUST contain at least one response code, and it SHOULD be the response for a successful operation call.
-    '{/^x-/}': '#/definitions/vendorExtension'
+    '{/x-*/}': '#/definitions/vendorExtension'
   # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#response-object
-  response:
+  responce:
+    'switch{$ref}!':
+      '@string': '#/definitions/jsonPointer'
+      'undefined': '#/definitions/responseDefinition'
+  responseDefinition:
     '{description}!': '@string'
     '{schema}':
       mixin: '#/definitions/schema'
@@ -194,7 +216,7 @@ definitions:
         '="file"': {}
     '{headers}': '#/definitions/headers'
     '{examples}': '#/definitions/examples'
-    '{/^x-/}': '#/definitions/vendorExtension'
+    '{/x-*/}': '#/definitions/vendorExtension'
   # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#headers-object
   headers:
     '{*}': '#/definitions/header'
@@ -205,13 +227,13 @@ definitions:
   header:
     '{description}': '@string'
     'extends': '#/definitions/stringifyValueMixin'
-    '{/^x-/}': '#/definitions/vendorExtension'
+    '{/x-*/}': '#/definitions/vendorExtension'
   # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#tag-object
   tag:
     '{name}!': '@string'
     '{description}': '@string'
     '{externalDocs}': '#/definitions/externalDocs'
-    '{/^x-/}': '#/definitions/vendorExtension'
+    '{/x-*/}': '#/definitions/vendorExtension'
   # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#schema-object
   schema:
     description: A deterministic version of a JSON Schema object.
@@ -219,12 +241,30 @@ definitions:
     #copied from https://github.com/json-schema/json-schema/blob/master/draft-04/schema
     '{title}': '@string'
     '{description}': '@string'
+    '{allOf}':
+      '[0..]!': '#/definitions/schema'
+    '{format}': '#/definitions/jsonSchemaFormat'
+    '{default}': '#/definitions/jsonSchemaDefault'
+    '{enum}': '#/definitions/jsonSchemaEnum'
+    # Swagger extensions
+    '{readOnly}':
+      type: boolean
+      default: false
+    '{xml}': '#/definitions/xml'
+    '{externalDocs}': '#/definitions/externalDocs'
+    '{example}': {}
+    '{/x-*/}': '#/definitions/vendorExtension'
     'switch{type}':
+      '=string': '#/definitions/jsonSchemaStringConstraintsMixin'
+      '=number': '#/definitions/jsonSchemaNumberConstraintsMixin'
+      '=integer': '#/definitions/jsonSchemaNumberConstraintsMixin'
+      '=boolean': {}
       '="array"':
         'switch{items}!':
           '@array':
             '[0..]!': '#/definitions/schema'
           '@object': '#/definitions/schema'
+        'extends': '#/definitions/jsonSchemaArrayConstraintsMixin'
       '="object"':
         '{required}':
           '[0..]!': '@string'
@@ -244,24 +284,7 @@ definitions:
           type: integer
           '>=': 0
           default: 0
-    '{allOf}':
-      '[0..]!': '#/definitions/schema'
-    # Swagger extensions
-    '{discriminator}': '@string'
-    '{readOnly}':
-      type: boolean
-      default: false
-    '{xml}': '#/definitions/xml'
-    '{externalDocs}': '#/definitions/externalDocs'
-    '{example}': {}
-    '{/^x-/}': '#/definitions/vendorExtension'
-    allOf:
-      - $ref: '#/definitions/jsonSchemaFormatMixin'
-      - $ref: '#/definitions/jsonSchemaEnumMixin'
-      - $ref: '#/definitions/jsonSchemaDefaultMixin'
-      - $ref: '#/definitions/jsonSchemaArrayConstraintsMixin'
-      - $ref: '#/definitions/jsonSchemaStringConstraintsMixin'
-      - $ref: '#/definitions/jsonSchemaNumberConstraintsMixin'
+        '{discriminator}': '@string'
   # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#xml-object
   xml:
     '{name}': '@string'
@@ -273,22 +296,7 @@ definitions:
     '{wrapped}':
       type: boolean
       default: false
-    '{/^x-/}': '#/definitions/vendorExtension'
-  # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#definitions-object
-  definitions:
-    description: One or more JSON objects describing the schemas being consumed and produced by the API.
-    '{*}': '#/definitions/schema'
-  # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#parameters-definitions-object
-  parametersDefinitions:
-    description: One or more JSON representations for parameters
-    '{*}': '#/definitions/parameter'
-  # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#responses-definitions-object
-  responsesDefinitions:
-    description: One or more JSON representations for parameters
-    '{*}': '#/definitions/response'
-  # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#security-definitions-object
-  securityDefinitions:
-    '{*}': '#/definitions/securityScheme'
+    '{/x-*/}': '#/definitions/vendorExtension'
   # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#security-scheme-object
   securityScheme:
     '{description}': '@string'
@@ -302,19 +310,22 @@ definitions:
         '{scopes}!': '#/definitions/oauth2Scopes'
         'switch{flow}!':
           '="implicit"':
-            '{authorizationUrl}!':'#/definitions/UrlString'
+            '{authorizationUrl}!': '#/definitions/urlString'
           '="password"':
-            '{tokenUrl}!': '#/definitions/UrlString'
+            '{tokenUrl}!': '#/definitions/urlString'
           '="application"':
-            '{tokenUrl}!': '#/definitions/UrlString'
+            '{tokenUrl}!': '#/definitions/urlString'
           '="accessCode"':
-            '{authorizationUrl}!':'#/definitions/UrlString'
-            '{tokenUrl}!': '#/definitions/UrlString'
-    '{/^x-/}': '#/definitions/vendorExtension'
+            '{authorizationUrl}!': '#/definitions/urlString'
+            '{tokenUrl}!': '#/definitions/urlString'
+    '{/x-*/}': '#/definitions/vendorExtension'
   # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#scopes-object
   oauth2Scopes:
     '{*}': '@string'
   # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#security-requirement-object
+  security:
+    '[0..]': '#/definitions/securityRequirement'
+    uniqueItems: true
   securityRequirement:
     '{*}':
       '[0..]': '@string'
@@ -324,79 +335,53 @@ definitions:
     description: Specification Extension to the Swagger Schema.
     type: any
 ##
-  UrlString:
+  urlString:
     type: string
     format: uri
-  parametersList:
-    description: The parameters needed to send a valid API call.
-    '[0..]':
-      #FIXME: $ref isn't valid parameter. How to handle?
-      $$ref: '#/definitions/parameter'
-      allOf:
-        $ref: '#/definitions/parameter'
-    uniqueItems: true
+  jsonPointer:
+    type: string
   mediaTypeList:
     '[0..]':
       description: The MIME type of the HTTP message.
       type: string
     uniqueItems: true
-  allowEmptyValueMixin:
-    properties:
-      allowEmptyValue:
-        description: allows sending a parameter by name only or with an empty value.
-        type: boolean
-        default: false
   stringifyValueMixin:
-    require:
-      - type
-    properties:
-      type: {}
-      collectionFormat:
-        #FIXME: check that only 'query' and 'formData' have 'multi' on top level
-        #check that on the same level in === 'query or in === 'formData'
-        enum: ['csv', 'ssv', 'tsv', 'pipes', 'multi']
-        default: csv
-    valueSwitch:
-      property: type
-      values:
-        string:
-          $ref: '#/definitions/jsonSchemaStringConstraintsMixin'
-        number:
-          $ref: '#/definitions/jsonSchemaNumberConstraintsMixin'
-        integer:
-          $ref: '#/definitions/jsonSchemaNumberConstraintsMixin'
-        boolean: {}
-        array:
-          require:
-            - items
-          properties:
-            items:
-              $ref: '#/definitions/primitivesItems'
-          allOf:
-            - $ref: '#/definitions/jsonSchemaArrayConstraintsMixin'
-    allOf:
-      - $ref: '#/definitions/jsonSchemaFormatMixin'
-      - $ref: '#/definitions/jsonSchemaEnumMixin'
-      - $ref: '#/definitions/jsonSchemaDefaultMixin'
-  jsonSchemaFormatMixin:
-    '{format}': '@string'
-  jsonSchemaEnumMixin:
-    '{enum}':
-      '[0..]!': {}
-      uniqueItems: true
-  jsonSchemaDefaultMixin:
-    '{default}': {}
-  jsonSchemaArrayConstraintsMixin:
-    '{maxItems}':
-      type: integer
-      '>=': 0
-    '{minItems}':
-      type: integer
-      '>=': 0
-      default: 0
-    '{uniqueItems}':
-      type: boolean
-      default: false
+    '{format}': '#/definitions/jsonSchemaFormat'
+    '{default}': '#/definitions/jsonSchemaDefault'
+    '{enum}': '#/definitions/jsonSchemaEnum'
+    'switch{type}!':
+      '=string': '#/definitions/jsonSchemaStringConstraintsMixin'
+      '=number': '#/definitions/jsonSchemaNumberConstraintsMixin'
+      '=integer': '#/definitions/jsonSchemaNumberConstraintsMixin'
+      '=boolean': {}
+      '=array':
+        '{items}!': '#/definitions/primitivesItems'
+        extends: '#/definitions/jsonSchemaArrayConstraintsMixin'
+        '{collectionFormat}':
+          enum: ['csv', 'ssv', 'tsv', 'pipes']
+          default: csv
+  #FIXME: duplicate of stringifyValueMixin to
+  # check that only 'query' and 'formData' have 'multi' on top level
+  stringifyValueMixinWithMultiArraySupport:
+    '{format}': '#/definitions/jsonSchemaFormat'
+    '{default}': '#/definitions/jsonSchemaDefault'
+    '{enum}': '#/definitions/jsonSchemaEnum'
+    'switch{type}!':
+      '=string': '#/definitions/jsonSchemaStringConstraintsMixin'
+      '=number': '#/definitions/jsonSchemaNumberConstraintsMixin'
+      '=integer': '#/definitions/jsonSchemaNumberConstraintsMixin'
+      '=boolean': {}
+      '=array':
+        '{items}!': '#/definitions/primitivesItems'
+        extends: '#/definitions/jsonSchemaArrayConstraintsMixin'
+        '{collectionFormat}':
+          enum: ['csv', 'ssv', 'tsv', 'pipes', 'multi']
+          default: csv
+  jsonSchemaEnum:
+    '[0..]!': {}
+    uniqueItems: true
+  jsonSchemaDefault: {}
+  jsonSchemaFormat: '@string'
   jsonSchemaStringConstraintsMixin:
     '{maxLength}':
       type: integer
@@ -422,11 +407,14 @@ definitions:
         '{exclusiveMinimum}':
           type: boolean
           default: false
-  security:
-    '[0..]': '#/definitions/securityRequirement'
-    uniqueItems: true
-  schemesList:
-    description: The transfer protocol of the API.
-    '[0..]':
-      enum: ['http', 'https', 'ws', 'wss']
-    uniqueItems: true
+  jsonSchemaArrayConstraintsMixin:
+    '{maxItems}':
+      type: integer
+      '>=': 0
+    '{minItems}':
+      type: integer
+      '>=': 0
+      default: 0
+    '{uniqueItems}':
+      type: boolean
+      default: false
